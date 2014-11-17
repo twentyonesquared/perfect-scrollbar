@@ -363,19 +363,41 @@
           return [deltaX, deltaY];
         };
 
+
+
+        // Function for fix. Check for ie version
+        // current code does not identify ie 11
+        var ieVer = function (){
+          var iev=0;
+
+          var trident = !!navigator.userAgent.match(/Trident\/7.0/);
+          var rv=navigator.userAgent.indexOf('rv:11.0');
+
+          if(navigator.appVersion.indexOf('MSIE 10') !== -1){
+            iev=10;
+          }
+          if(trident&&rv!==-1){
+            iev=11;
+          }
+
+          return iev;
+        };
+
         var mousewheelHandler = function (e) {
           // Fix for select problem.
           // Specifically checks for hover event on options WITHIN select elements
 
-          var selectOptionHovered = !!$('select option').filter(function() {
+          var isWebkit = 'WebkitAppearance' in document.documentElement.style;
+
+          var selectOptionHovered = !!$('select:focus option').filter(function() {
             return $(this).is(':hover');
           }).length;
 
-
           if(selectOptionHovered){
-            return;
+            if(!isWebkit || ieVer() > 9){
+              return;
+            }
           }
-
 
 
           var delta = getDeltaFromEvent(e);
